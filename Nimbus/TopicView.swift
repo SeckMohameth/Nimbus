@@ -8,11 +8,15 @@
 import SwiftUI
 
 struct TopicView: View {
+    var topic: Topic
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Text(topic.name)
     }
 }
 
 #Preview {
-    TopicView()
+    NavigationStack {
+        TopicView(topic: Topic(name: "Circle Pulse", details: "A pulse animation with a circle shape", category: "Animations", modifiers: ["animation"]))
+        }
 }
