@@ -45,3 +45,10 @@ git clone https://github.com/SeckMohameth/Nimbus.git
 1. Open the project in Xcode  
 2. Run the app on a simulator or device
 3. Browse Topics and view code samples directly in the app
+
+
+## 🤝 Contributing
+Contributions are welcome! 🎉
+Whether you're new to open source or experienced, your ideas are appreciated.
+
+If you’d like to add your own SwiftUI view, fix a bug, or improve the app, please check out the [CONTRIBUTING.md](https://github.com/SeckMohameth/Nimbus/blob/main/CONTRIBUTING.md) guide for full details on how to get started.
