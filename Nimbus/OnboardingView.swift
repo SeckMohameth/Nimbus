@@ -1,127 +1,151 @@
+//
+//  OnboardingView.swift
+//  Nimbus
+//
+//  Created by Mohameth Seck on 1/9/25.
+//
+
 import SwiftUI
 
-struct OnboardingItem {
-    let title: String
-    let description: String
-    let systemImage: String
-}
-
 struct OnboardingView: View {
-    @State private var currentPage = 0
-    @State private var isOnboardingComplete = false
-    @State private var imageScale = 0.8
-    @State private var textOpacity = 0.0
-    
-    let items = [
-        OnboardingItem(
-            title: "SwiftUI Components Library",
-            description: "Discover a curated collection of beautiful and reusable SwiftUI components",
-            systemImage: "square.grid.2x2"
-        ),
-        OnboardingItem(
-            title: "Learn & Implement",
-            description: "Each component comes with detailed code examples and documentation",
-            systemImage: "doc.text.magnifyingglass"
-        ),
-        OnboardingItem(
-            title: "Contribute & Share",
-            description: "Join our community and share your own SwiftUI components",
-            systemImage: "person.2.fill"
-        )
-    ]
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @State private var isAnimating = false
     
     var body: some View {
-        if isOnboardingComplete {
-            ContentView()
-        } else {
-            TabView(selection: $currentPage) {
-                ForEach(0..<items.count, id: \.self) { index in
-                    VStack(spacing: 30) {
-                        if index == 0 {
-                            // App logo
-                            Image("logo")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 150, height: 150)
-                                .scaleEffect(imageScale)
-                        } else {
-                            // System icon
-                            Image(systemName: items[index].systemImage)
-                                .font(.system(size: 60))
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [.blue, .pink],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .scaleEffect(imageScale)
-                        }
-                        
-                        Text(items[index].title)
-                            .font(.title2)
-                            .bold()
-                            .opacity(textOpacity)
-                        
-                        Text(items[index].description)
-                            .font(.body)
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal, 32)
-                            .opacity(textOpacity)
-                        
-                        if index == items.count - 1 {
-                            Button(action: {
-                                withAnimation {
-                                    isOnboardingComplete = true
-                                }
-                            }) {
-                                Text("Get Started")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .frame(width: 200, height: 50)
-                                    .background(
-                                        LinearGradient(
-                                            colors: [.blue, .pink],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                                    .cornerRadius(25)
-                            }
-                            .opacity(textOpacity)
-                        }
-                    }
-                    .tag(index)
-                    .onAppear {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                            imageScale = 1.0
-                        }
-                        withAnimation(.easeIn(duration: 0.4).delay(0.2)) {
-                            textOpacity = 1.0
-                        }
-                    }
-                    .onDisappear {
-                        imageScale = 0.8
-                        textOpacity = 0.0
-                    }
-                }
-            }
-            .tabViewStyle(.page)
-            .indexViewStyle(.page(backgroundDisplayMode: .always))
-            .background(
-                LinearGradient(
-                    colors: [.white, Color(.systemGray6)],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
+        TabView {
+            // First page with github background
+            OnboardingPage(
+                title: "Welcome to Nimbus",
+                description: "Your SwiftUI Component Library",  // Shorter description
+                imageName: "square.grid.2x2",
+                backgroundImage: "github"
             )
+            
+            // Second page with xcode background
+            OnboardingPage(
+                title: "Browse Components",
+                description: "Find and learn SwiftUI examples",  // Shorter description
+                imageName: "doc.text.magnifyingglass",
+                backgroundImage: "xcode"
+            )
+            
+            // Third page with cafe background
+            OnboardingPage(
+                title: "Save Favorites",
+                description: "Bookmark components for quick access",  // Shorter description
+                imageName: "star.fill",
+                backgroundImage: "cafe"
+            )
+            
+            // Final page with logo
+            ZStack {
+                Image("github")
+                    .resizable()
+                    .scaledToFill()
+                    .overlay(Color.black.opacity(0.4))
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 30) {
+                    Image("logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 150, height: 150)
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                        .shadow(radius: 10)
+                        .scaleEffect(isAnimating ? 1.0 : 0.5)
+                        .opacity(isAnimating ? 1.0 : 0.0)
+                        .animation(.easeOut(duration: 0.8), value: isAnimating)
+                    
+                    Text("Ready to Start?")
+                        .font(.title)
+                        .bold()
+                        .foregroundColor(.white)
+                        .opacity(isAnimating ? 1.0 : 0.0)
+                        .offset(y: isAnimating ? 0 : 20)
+                        .animation(.easeOut(duration: 0.8).delay(0.3), value: isAnimating)
+                    
+                    Button("Get Started") {
+                        withAnimation {
+                            hasCompletedOnboarding = true
+                        }
+                    }
+                    .font(.headline)
+                    .foregroundColor(.blue)
+                    .padding(.horizontal, 50)
+                    .padding(.vertical, 16)
+                    .background(Color.white)
+                    .cornerRadius(30)
+                    .shadow(radius: 10)
+                    .opacity(isAnimating ? 1.0 : 0.0)
+                    .offset(y: isAnimating ? 0 : 20)
+                    .animation(.easeOut(duration: 0.8).delay(0.5), value: isAnimating)
+                }
+                .padding(.horizontal, 20)
+            }
+            .onAppear { isAnimating = true }
+            .onDisappear { isAnimating = false }
         }
+        .tabViewStyle(.page)
+        .ignoresSafeArea()
+    }
+}
+
+struct OnboardingPage: View {
+    let title: String
+    let description: String
+    let imageName: String
+    let backgroundImage: String
+    @State private var isAnimating = false
+    
+    var body: some View {
+        ZStack {
+            // Background Image
+            Image(backgroundImage)
+                .resizable()
+                .scaledToFill()
+                .overlay(Color.black.opacity(0.5))
+                .ignoresSafeArea()
+            
+            // Content
+            VStack(spacing: 40) {
+                Spacer()
+                
+                Image(systemName: imageName)
+                    .font(.system(size: 60))
+                    .foregroundColor(.white)
+                    .opacity(isAnimating ? 1.0 : 0.0)
+                    .offset(y: isAnimating ? 0 : 20)
+                    .animation(.easeOut(duration: 0.8), value: isAnimating)
+                
+                VStack(spacing: 25) {  // Increased spacing between title and description
+                    Text(title)
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 2)
+                    
+                    Text(description)
+                        .font(.system(size: 22))  // Slightly larger font
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: 2)
+                }
+                .padding(.horizontal, 32)  // Increased horizontal padding
+                .opacity(isAnimating ? 1.0 : 0.0)
+                .offset(y: isAnimating ? 0 : 20)
+                .animation(.easeOut(duration: 0.8).delay(0.2), value: isAnimating)
+                
+                Spacer()
+                Spacer()
+            }
+            .padding(.bottom, 60)
+        }
+        .onAppear { isAnimating = true }
+        .onDisappear { isAnimating = false }
     }
 }
 
 #Preview {
     OnboardingView()
 }
-
-// End of file. No additional code.

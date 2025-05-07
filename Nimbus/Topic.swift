@@ -7,16 +7,16 @@
 
 import Foundation
 
-class Topic {
-    var name: String
-    var details: String
-    var category: String
-    var modifiers: [String]
+struct Topic: Identifiable {
+    let id = UUID()
+    let name: String
+    let details: String
+    let category: String
+    let modifiers: [String]
+    var sourceCode: String = ""
+    let previewCode: String? = nil
     
-    init(name: String, details: String, category: String, modifiers: [String]) {
-        self.name = name
-        self.details = details
-        self.category = category
-        self.modifiers = modifiers
-    }
+    // Documentation links and references
+    var documentationLinks: [String]? = nil
+    var githubURL: String? = nil
 }

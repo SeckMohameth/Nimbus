@@ -1,14 +1,13 @@
-
 import SwiftUI
 
 struct RecentlyViewedView: View {
-    @Environment(\.recentlyViewedTopics) private var recentlyViewedTopics
+    @EnvironmentObject private var recentlyViewedManager: RecentlyViewedManager
     let topics: [Topic]
     
     var body: some View {
-        if !recentlyViewedTopics.isEmpty {
+        if !recentlyViewedManager.recentTopics.isEmpty {
             Section(header: Text("Recently Viewed")) {
-                ForEach(recentlyViewedTopics, id: \.self) { topicName in
+                ForEach(recentlyViewedManager.recentTopics, id: \.self) { topicName in
                     if let topic = topics.first(where: { $0.name == topicName }) {
                         NavigationLink(destination: TopicView(topic: topic)) {
                             VStack(alignment: .leading) {
@@ -28,4 +27,5 @@ struct RecentlyViewedView: View {
 
 #Preview {
     RecentlyViewedView(topics: TopicData.topics)
+        .environmentObject(RecentlyViewedManager())
 }
